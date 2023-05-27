@@ -6,7 +6,7 @@
       <div class="header mb-6">
         <h1 class="text-4xl font-bold text-center mb-2 text-white">Gym Bros</h1>
         <p class="text-xl text-center mb-4 text-white">
-          The Calendar for Gym Enthusiasts &#x1F4AA;
+          The Tracking Calendar for Gym Enthusiasts &#x1F4AA;
         </p>
       </div>
       <div class="profile-selector mb-4">
@@ -96,32 +96,92 @@
         Save
       </button>
     </div>
-    <footer
-      class="bg-gradient-to-r from-gray-900 to-blue-900 text-gray-300 py-3 px-6 flex items-center justify-between sticky bottom-0 z-50"
+
+    <div class="score mb-2 flex items-center justify-center">
+      <button
+        @click="showInformation"
+        class="info-button bg-gray-400 hover:bg-blue-700 text-white text-3xl py-2 px-4 rounded mt-4"
+      >
+        &#128712;
+      </button>
+    </div>
+
+    <div
+  v-if="showModal"
+  class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-75"
+>
+  <div class="bg-white rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-4">&#x1F4AA; Site Information &#x1F4AA;</h2>
+    <p>
+      This site, Gym Bros, is a calendar for gym enthusiasts. It helps you plan and track your workouts. Here are some details:
+    </p>
+    <ul class="mt-4 mb-4">
+      <li>
+        <strong>Difficulties:</strong>
+        <ul class="ml-4">
+          <li><strong>Easy:</strong> Handicap 4</li>
+          <li><strong>Normal:</strong> Handicap 3.33</li>
+          <li><strong>Hard:</strong> Handicap 2</li>
+        </ul>
+      </li>
+    </ul>
+    <div>
+      <strong>Scores:</strong>
+      <p>
+        You can select a difficulty level and score your monthly workouts. Please always press SAVE to save your progress.
+      </p>
+    </div>
+    <button
+      @click="closeModal"
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6"
     >
-      <p class="text-white-600 text-sm">Made by Alejo with &#x2764;</p>
-    </footer>
+      Close
+    </button>
+  </div>
+</div>
+
+
+ 
+
+<footer class="bg-gradient-to-r from-gray-900 to-blue-900 text-gray-300 py-3 px-6 flex items-center justify-between sticky bottom-0 z-50">
+  <p class="text-white-600 text-sm">
+    Made by Alejo with &#x2764;
+    <a href="https://github.com/alejocg/thegymbros" target="_blank" rel="noopener noreferrer">
+      <span class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.37.6.11.82-.258.82-.577v-2.022c-3.34.72-4.042-1.617-4.042-1.617-.548-1.397-1.338-1.777-1.338-1.777-1.09-.74.082-.72.082-.72 1.218.065 1.965 1.027 2.195 1.403.682 1.127 1.773.833 2.206.634.07-.495.267-.832.485-1.023-1.698-.19-3.475-.85-3.475-3.787 0-.837.3-1.518.795-2.05-.08-.194-.347-.975.075-2.033 0 0 .643-.206 2.105.787A7.58 7.58 0 0112 6.587c.663.003 1.333.09 1.967.267 1.461-.994 2.104-.787 2.104-.787.424 1.058.157 1.84.078 2.033.494.533.792 1.216.792 2.053 0 2.945-1.782 3.594-3.484 3.778.274.238.52.706.52 1.42v2.105c0 .319.214.688.828.573C20.565 21.795 24 17.3 24 12c0-6.63-5.37-12-12-12z"
+          />
+        </svg>
+        <span>Github</span>
+      </span>
+    </a>
+  </p>
+  <div class="ml-auto">
+    <p class="text-white-600 text-sm">Alpha 27523</p>
+  </div>
+</footer>
+
+    
   </div>
 </template>
 
 <script>
- 
-
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  "https://fbnqzkjzrogkmnfekqlq.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZibnF6a2p6cm9na21uZmVrcWxxIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODUxMzQwMTIsImV4cCI6MjAwMDcxMDAxMn0.OjdrpP6JO1pHjwh8l_g2KB8NCIz-Iwnd1XXy7XimrGY"
-);
+const supabase = createClient(process.env.VUE_APP_SUPABASE_URL, process.env.VUE_APP_SUPABASE_KEY);
+
 
 export default {
   data() {
     return {
+      showModal: false,
+
       selectedProfile: 0,
       profiles: [
-        { name: "AC", days: [] },
-        { name: "AM", days: [] },
-        { name: "JB", days: [] },
-        { name: "JM", days: [] },
+        { name: "AC", dates: [] },
+        { name: "AM", dates: [] },
+        { name: "JB", dates: [] },
+        { name: "JM", dates: [] },
       ],
       selectedMonth: new Date().getMonth(),
       months: [
@@ -149,12 +209,20 @@ export default {
       ],
     };
   },
-  
+
   mounted() {
     this.loadProfile();
     this.updateCalendar();
   },
+
   methods: {
+    showInformation() {
+      this.showModal = true;
+    },
+
+    closeModal() {
+      this.showModal = false;
+    },
     updateCalendar() {
       const year = new Date().getFullYear();
       const month = this.selectedMonth;
@@ -181,6 +249,15 @@ export default {
     toggleDaySelection(weekIndex, dayIndex) {
       const day = this.calendar[weekIndex][dayIndex];
       day.isSelected = !day.isSelected;
+
+      const monthIndex = this.selectedMonth;
+      const selectedProfile = this.profiles[this.selectedProfile];
+      const selectedDays = this.calendar
+        .flat()
+        .filter((day) => day.isSelected)
+        .map((day) => `${monthIndex}-${day.date}`);
+
+      selectedProfile.days = selectedDays;
       this.updateScore();
     },
     updateScore() {
@@ -197,42 +274,64 @@ export default {
       return Math.round(score); // Round the score
     },
     loadProfile() {
-      const selectedProfile = this.profiles[this.selectedProfile];
-      this.calendar.forEach((week) => {
-        week.forEach((day) => {
-          day.isSelected = selectedProfile.days.includes(day.date);
-        });
-      });
-      this.updateScore();
-    },
+      // Fetch the selected profile's data from the database
+      supabase
+        .from("profiles")
+        .select("dates")
+        .eq("id", this.selectedProfile)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error("Error fetching profile data:", error);
+            window.alert("Error!! Call Alejo!!");
+            return;
+          }
 
+          const savedDates = data.dates || [];
+
+          this.calendar.forEach((week) => {
+            week.forEach((day) => {
+              const isCurrentMonth = day.isCurrentMonth;
+              const dayOfMonth = day.date;
+              const monthIndex = this.selectedMonth;
+              const date = `${monthIndex}-${dayOfMonth}`;
+
+              // Check if the day belongs to the selected month and is saved
+              day.isSelected = isCurrentMonth && savedDates.includes(date);
+            });
+          });
+
+          this.updateScore();
+        })
+        .catch((error) => {
+          console.error("Error fetching profile data:", error);
+          window.alert("Error!! Call Alejo!!");
+        });
+    },
     async saveProfile() {
       const selectedProfile = this.profiles[this.selectedProfile];
-      selectedProfile.days = this.calendar
+      selectedProfile.dates = this.calendar
         .flat()
         .filter((day) => day.isSelected)
-        .map((day) => day.date);
+        .map((day) => `${this.selectedMonth}-${day.date}`);
 
       try {
         // Save the selected profile in the Supabase database
         const { data, error } = await supabase
           .from("profiles")
-          .upsert([{ id: this.selectedProfile, days: selectedProfile.days }]);
+          .upsert([{ id: this.selectedProfile, dates: selectedProfile.dates }]);
 
         if (error) {
-          console.error("Error saving days:", error);
+          console.error("Error saving dates:", error);
           window.alert("Error!! Call Alejo!!");
-
           return;
         }
 
-        console.log("Days saved successfully:", data);
-        window.alert("Days saved successfully!");
-
+        console.log("Dates saved successfully:", data);
+        window.alert("Dates saved successfully!");
       } catch (error) {
-        console.error("Error saving days:", error);
+        console.error("Error saving dates:", error);
         window.alert("Error!! Call Alejo!!");
-
       }
     },
   },
