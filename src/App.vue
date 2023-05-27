@@ -57,7 +57,16 @@
             {{ difficulty.label }}
           </option>
         </select>
+        <div class="score mb-2 flex">
+          <button
+            @click="showInformation"
+            class="info-button bg-blue-200 hover:bg-blue-700 text-white text-xl py-2 px-4 rounded mt-4"
+          >
+            &#x2139;
+          </button>
+        </div>
       </div>
+
       <div class="score mb-6 flex items-center justify-center">
         <button
           class="text-xl score-button bg-yellow-200 text-blue-800 hover:text-blue-900 font-bold py-2 px-4 rounded"
@@ -91,18 +100,9 @@
       </table>
       <button
         @click="saveProfile"
-        class="save-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+        class="save-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 text-xl"
       >
         Save
-      </button>
-    </div>
-
-    <div class="score mb-2 flex items-center justify-center">
-      <button
-        @click="showInformation"
-        class="info-button bg-gray-400 hover:bg-blue-700 text-white text-3xl py-2 px-4 rounded mt-4"
-      >
-        &#128712;
       </button>
     </div>
 
